@@ -85,6 +85,7 @@
 
 .board__task {
   flex-shrink: 0;
+  touch-action: none;
 }
 
 .board__task-top {

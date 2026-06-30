@@ -1,0 +1,27 @@
+.board__task[draggable='true'] {
+  cursor: grab;
+}
+
+.board__task--dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+
+.board__col-body--drag-over {
+  background: rgba(139, 92, 255, 0.06);
+  outline: 1px dashed rgba(139, 92, 255, 0.35);
+  outline-offset: -4px;
+  border-radius: 12px;
+}
+
+.board__drop-placeholder {
+  height: 4.5rem;
+  border-radius: 12px;
+  border: 2px dashed rgba(34, 211, 238, 0.45);
+  background: rgba(34, 211, 238, 0.08);
+  flex-shrink: 0;
+}
+
+.board__col-body {
+  min-height: 120px;
+}

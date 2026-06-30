@@ -71,13 +71,14 @@ export async function createTask({ projectId, stageId, title, description }) {
   return data;
 }
 
-export async function updateTask(taskId, { title, description, stageId, done }) {
+export async function updateTask(taskId, { title, description, stageId, done, position }) {
   const payload = {};
 
   if (title != null) payload.title = title.trim();
   if (description != null) payload.description = description.trim() || null;
   if (stageId != null) payload.stage_id = stageId;
   if (done != null) payload.done = done;
+  if (position != null) payload.position = position;
 
   const { data, error } = await supabase
     .from('tasks')
@@ -97,4 +98,70 @@ export async function deleteTask(taskId) {
 
 export async function toggleTaskDone(taskId, done) {
   return updateTask(taskId, { done });
+}
+
+export function computeTaskMoveUpdates(board, taskId, toStageId, toIndex) {
+  const task = board.tasks.find((item) => item.id === taskId);
+  if (!task) return [];
+
+  const fromStageId = task.stage_id;
+  const targetTasks = board.tasks
+    .filter((item) => item.stage_id === toStageId && item.id !== taskId)
+    .sort((a, b) => a.position - b.position);
+
+  const clampedIndex = Math.max(0, Math.min(toIndex, targetTasks.length));
+  targetTasks.splice(clampedIndex, 0, task);
+
+  const updates = targetTasks.map((item, index) => ({
+    id: item.id,
+    stage_id: toStageId,
+    position: index,
+  }));
+
+  if (fromStageId !== toStageId) {
+    const sourceTasks = board.tasks
+      .filter((item) => item.stage_id === fromStageId && item.id !== taskId)
+      .sort((a, b) => a.position - b.position);
+
+    sourceTasks.forEach((item, index) => {
+      updates.push({
+        id: item.id,
+        stage_id: fromStageId,
+        position: index,
+      });
+    });
+  }
+
+  return updates;
+}
+
+export function applyUpdatesToBoard(board, updates) {
+  updates.forEach((update) => {
+    const task = board.tasks.find((item) => item.id === update.id);
+    if (task) {
+      task.stage_id = update.stage_id;
+      task.position = update.position;
+    }
+  });
+}
+
+export function isMoveNoOp(board, updates) {
+  return updates.every((update) => {
+    const task = board.tasks.find((item) => item.id === update.id);
+    return task && task.stage_id === update.stage_id && task.position === update.position;
+  });
+}
+
+export async function applyTaskOrder(updates) {
+  const results = await Promise.all(
+    updates.map((update) =>
+      supabase
+        .from('tasks')
+        .update({ stage_id: update.stage_id, position: update.position })
+        .eq('id', update.id)
+    )
+  );
+
+  const failed = results.find((result) => result.error);
+  if (failed?.error) throw failed.error;
 }

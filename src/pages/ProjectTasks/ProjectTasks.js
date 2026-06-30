@@ -1,12 +1,17 @@
 import template from './ProjectTasks.html?raw';
 import './ProjectTasks.css';
 import {
+  applyTaskOrder,
+  applyUpdatesToBoard,
+  computeTaskMoveUpdates,
   createTask,
   deleteTask,
   fetchProjectBoard,
+  isMoveNoOp,
   toggleTaskDone,
   updateTask,
 } from '../../lib/api/tasks.js';
+import { initBoardDragDrop } from '../../components/BoardDragDrop/BoardDragDrop.js';
 import { openTaskModal, showDeleteTaskConfirm } from '../../components/TaskModal/TaskModal.js';
 import { escapeHtml } from '../../lib/utils.js';
 import { navigate } from '../../router/router.js';
@@ -19,7 +24,9 @@ function stageColor(index) {
 }
 
 function tasksForStage(tasks, stageId) {
-  return tasks.filter((task) => task.stage_id === stageId);
+  return tasks
+    .filter((task) => task.stage_id === stageId)
+    .sort((a, b) => a.position - b.position);
 }
 
 function renderTaskCard(task) {
@@ -28,7 +35,11 @@ function renderTaskCard(task) {
     : '';
 
   return `
-    <article class="card board__task p-3 ${task.done ? 'board__task--done' : ''}" data-task-id="${task.id}">
+    <article
+      class="card board__task p-3 ${task.done ? 'board__task--done' : ''}"
+      data-task-id="${task.id}"
+      draggable="true"
+    >
       <div class="board__task-top">
         <div class="form-check mb-1 flex-grow-1">
           <input class="form-check-input" type="checkbox" data-toggle-done ${task.done ? 'checked' : ''} id="task-done-${task.id}" />
@@ -50,18 +61,16 @@ function renderTaskCard(task) {
 
 function renderColumn(stage, tasks, stageIndex) {
   const stageTasks = tasksForStage(tasks, stage.id);
-  const cards = stageTasks.length
-    ? stageTasks.map(renderTaskCard).join('')
-    : '<p class="board__empty text-soft small mb-0">No tasks yet</p>';
+  const cards = stageTasks.map(renderTaskCard).join('');
 
   return `
     <div class="board__col" data-stage-id="${stage.id}">
       <div class="board__col-head">
         <span class="board__dot" style="--dot: ${stageColor(stageIndex)}"></span>
         <span class="fw-semibold">${escapeHtml(stage.name)}</span>
-        <span class="board__count">${stageTasks.length}</span>
+        <span class="board__count" data-stage-count="${stage.id}">${stageTasks.length}</span>
       </div>
-      <div class="board__col-body">
+      <div class="board__col-body" data-stage-id="${stage.id}">
         ${cards}
       </div>
     </div>
@@ -88,6 +97,11 @@ export function render(container, params = {}) {
 
   let board = null;
   let cancelled = false;
+  let cleanupDragDrop = null;
+
+  function paintBoard() {
+    renderBoard(boardEl, board);
+  }
 
   async function loadBoard() {
     setLoading(container, true);
@@ -115,7 +129,7 @@ export function render(container, params = {}) {
       }
 
       scrollEl.classList.remove('d-none');
-      renderBoard(boardEl, board);
+      paintBoard();
     } catch (error) {
       if (cancelled) return;
       toast.fromError(error, 'Could not load tasks board.');
@@ -123,6 +137,38 @@ export function render(container, params = {}) {
       if (!cancelled) {
         setLoading(container, false);
       }
+    }
+  }
+
+  async function handleTaskMove({ taskId, stageId, toIndex }) {
+    if (!board) return;
+
+    const updates = computeTaskMoveUpdates(board, taskId, stageId, toIndex);
+    if (!updates.length || isMoveNoOp(board, updates)) {
+      return;
+    }
+
+    const previous = board.tasks.map((task) => ({
+      id: task.id,
+      stage_id: task.stage_id,
+      position: task.position,
+    }));
+
+    applyUpdatesToBoard(board, updates);
+    paintBoard();
+
+    try {
+      await applyTaskOrder(updates);
+    } catch (error) {
+      previous.forEach((item) => {
+        const task = board.tasks.find((entry) => entry.id === item.id);
+        if (task) {
+          task.stage_id = item.stage_id;
+          task.position = item.position;
+        }
+      });
+      paintBoard();
+      toast.fromError(error, 'Could not move task.');
     }
   }
 
@@ -212,11 +258,13 @@ export function render(container, params = {}) {
 
   addBtn.addEventListener('click', onAddTask);
   boardEl.addEventListener('click', onBoardClick);
+  cleanupDragDrop = initBoardDragDrop(scrollEl, { onMove: handleTaskMove });
   loadBoard();
 
   return () => {
     cancelled = true;
     addBtn.removeEventListener('click', onAddTask);
     boardEl.removeEventListener('click', onBoardClick);
+    cleanupDragDrop?.();
   };
 }
