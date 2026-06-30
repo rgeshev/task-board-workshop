@@ -1,11 +1,22 @@
 import { Modal } from 'bootstrap';
 import { showConfirm } from '../ConfirmModal/ConfirmModal.js';
+import {
+  deleteTaskAttachment,
+  fetchTaskAttachments,
+  getAttachmentDownloadUrl,
+  uploadTaskAttachment,
+  validateAttachmentFile,
+} from '../../lib/api/attachments.js';
+import { escapeHtml, formatFileSize, truncate } from '../../lib/utils.js';
 import { toast } from '../../lib/toast.js';
 import './TaskModal.css';
 
 let modalEl = null;
 let modalInstance = null;
 let submitHandler = null;
+let pendingFiles = [];
+let currentTaskId = null;
+let currentMode = 'add';
 
 function ensureModal() {
   if (modalEl) return modalEl;
@@ -15,7 +26,7 @@ function ensureModal() {
   modalEl.tabIndex = -1;
   modalEl.setAttribute('aria-hidden', 'true');
   modalEl.innerHTML = `
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h2 class="modal-title h5 mb-0" data-task-modal-title>Task</h2>
@@ -40,6 +51,23 @@ function ensureModal() {
                 <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
                 <input type="date" class="form-control" id="task-due-date" name="dueDate" />
               </div>
+            </div>
+            <div class="mb-3" data-attachments-section>
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                <label class="form-label small text-soft mb-0">Attachments</label>
+                <button type="button" class="btn btn-sm btn-glass" data-add-attachment>
+                  <i class="bi bi-paperclip me-1"></i>Add file
+                </button>
+              </div>
+              <p class="text-soft small mb-2">Images and PDFs, up to 50 MB each.</p>
+              <input
+                type="file"
+                class="d-none"
+                data-attachment-input
+                accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+              />
+              <ul class="task-modal__attachments list-unstyled mb-0" data-attachment-list></ul>
+              <p class="text-soft small mb-0 mt-2 d-none" data-attachment-empty>No attachments yet.</p>
             </div>
             <div class="mb-3">
               <label class="form-label small text-soft" for="task-stage">Stage</label>
@@ -66,6 +94,99 @@ function ensureModal() {
   modalInstance = new Modal(modalEl);
 
   const form = modalEl.querySelector('[data-task-form]');
+  const addBtn = modalEl.querySelector('[data-add-attachment]');
+  const fileInput = modalEl.querySelector('[data-attachment-input]');
+  const attachmentList = modalEl.querySelector('[data-attachment-list]');
+
+  addBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', async () => {
+    const files = Array.from(fileInput.files ?? []);
+    fileInput.value = '';
+
+    if (!files.length) return;
+
+    if (currentMode === 'add') {
+      for (const file of files) {
+        try {
+          validateAttachmentFile(file);
+          pendingFiles.push(file);
+        } catch (error) {
+          toast.error(error.message);
+        }
+      }
+      renderPendingAttachments();
+      return;
+    }
+
+    if (!currentTaskId) return;
+
+    for (const file of files) {
+      try {
+        validateAttachmentFile(file);
+        await uploadTaskAttachment(currentTaskId, file);
+        toast.success(`"${truncate(file.name, 40)}" uploaded.`);
+      } catch (error) {
+        toast.fromError(error, `Could not upload "${truncate(file.name, 40)}".`);
+      }
+    }
+
+    await loadEditAttachments();
+  });
+
+  attachmentList.addEventListener('click', async (event) => {
+    const viewBtn = event.target.closest('[data-view-attachment]');
+    const deleteBtn = event.target.closest('[data-delete-attachment]');
+    const removePendingBtn = event.target.closest('[data-remove-pending]');
+
+    if (viewBtn) {
+      event.preventDefault();
+      const storagePath = viewBtn.getAttribute('data-storage-path');
+      try {
+        const url = await getAttachmentDownloadUrl(storagePath);
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } catch (error) {
+        toast.fromError(error, 'Could not open attachment.');
+      }
+      return;
+    }
+
+    if (removePendingBtn) {
+      const index = Number(removePendingBtn.getAttribute('data-index'));
+      pendingFiles.splice(index, 1);
+      renderPendingAttachments();
+      return;
+    }
+
+    if (deleteBtn) {
+      const attachmentId = deleteBtn.getAttribute('data-attachment-id');
+      const fileName = deleteBtn.getAttribute('data-file-name');
+      const confirmed = await showConfirm({
+        title: 'Delete attachment?',
+        message: `Remove "${fileName}" from this task?`,
+        confirmLabel: 'Delete',
+        confirmClass: 'btn-danger',
+      });
+
+      if (!confirmed) return;
+
+      deleteBtn.disabled = true;
+
+      try {
+        const attachment = {
+          id: attachmentId,
+          storage_path: deleteBtn.getAttribute('data-storage-path'),
+        };
+        await deleteTaskAttachment(attachment);
+        toast.success('Attachment deleted.');
+        await loadEditAttachments();
+      } catch (error) {
+        toast.fromError(error, 'Could not delete attachment.');
+        deleteBtn.disabled = false;
+      }
+    }
+  });
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!submitHandler) return;
@@ -80,6 +201,7 @@ function ensureModal() {
         stageId: form.stageId.value,
         dueDate: form.dueDate.value || null,
         done: form.done.checked,
+        pendingFiles: [...pendingFiles],
       };
 
       if (!values.title) {
@@ -89,12 +211,115 @@ function ensureModal() {
 
       await submitHandler(values);
       modalInstance.hide();
+    } catch {
+      // Keep modal open when submit handler reports partial failures.
     } finally {
       submitBtn.disabled = false;
     }
   });
 
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    pendingFiles = [];
+    currentTaskId = null;
+    currentMode = 'add';
+    renderPendingAttachments();
+    modalEl.querySelector('[data-attachment-list]').innerHTML = '';
+    modalEl.querySelector('[data-attachment-empty]')?.classList.add('d-none');
+  });
+
   return modalEl;
+}
+
+function attachmentIcon(mimeType) {
+  return mimeType === 'application/pdf' ? 'bi-file-earmark-pdf' : 'bi-file-earmark-image';
+}
+
+function renderPendingAttachments() {
+  const listEl = modalEl.querySelector('[data-attachment-list]');
+  const emptyEl = modalEl.querySelector('[data-attachment-empty]');
+
+  if (!pendingFiles.length) {
+    listEl.innerHTML = '';
+    if (currentMode === 'add') {
+      emptyEl?.classList.remove('d-none');
+    }
+    return;
+  }
+
+  emptyEl?.classList.add('d-none');
+  listEl.innerHTML = pendingFiles
+    .map(
+      (file, index) => `
+        <li class="task-modal__attachment">
+          <div class="task-modal__attachment-info">
+            <i class="bi ${attachmentIcon(file.type)}"></i>
+            <span class="task-modal__attachment-name">${escapeHtml(truncate(file.name, 48))}</span>
+            <span class="task-modal__attachment-size text-soft">${formatFileSize(file.size)}</span>
+            <span class="badge text-bg-secondary">Pending</span>
+          </div>
+          <button type="button" class="btn btn-sm btn-glass text-danger" data-remove-pending data-index="${index}" title="Remove">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </li>
+      `
+    )
+    .join('');
+}
+
+async function loadEditAttachments() {
+  const listEl = modalEl.querySelector('[data-attachment-list]');
+  const emptyEl = modalEl.querySelector('[data-attachment-empty]');
+
+  if (!currentTaskId) return;
+
+  try {
+    const attachments = await fetchTaskAttachments(currentTaskId);
+
+    if (!attachments.length) {
+      listEl.innerHTML = '';
+      emptyEl?.classList.remove('d-none');
+      return;
+    }
+
+    emptyEl?.classList.add('d-none');
+    listEl.innerHTML = attachments
+      .map(
+        (attachment) => `
+          <li class="task-modal__attachment">
+            <div class="task-modal__attachment-info">
+              <i class="bi ${attachmentIcon(attachment.mime_type)}"></i>
+              <span class="task-modal__attachment-name">${escapeHtml(truncate(attachment.file_name, 48))}</span>
+              <span class="task-modal__attachment-size text-soft">${formatFileSize(attachment.size_bytes)}</span>
+            </div>
+            <div class="task-modal__attachment-actions">
+              <button
+                type="button"
+                class="btn btn-sm btn-glass"
+                data-view-attachment
+                data-storage-path="${escapeHtml(attachment.storage_path)}"
+                title="View"
+              >
+                <i class="bi bi-box-arrow-up-right"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-glass text-danger"
+                data-delete-attachment
+                data-attachment-id="${attachment.id}"
+                data-storage-path="${escapeHtml(attachment.storage_path)}"
+                data-file-name="${escapeHtml(attachment.file_name)}"
+                title="Delete"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </li>
+        `
+      )
+      .join('');
+  } catch (error) {
+    toast.fromError(error, 'Could not load attachments.');
+  }
 }
 
 function populateStages(stages, selectedStageId) {
@@ -117,6 +342,10 @@ export function openTaskModal({
   ensureModal();
 
   const isEdit = mode === 'edit';
+  currentMode = mode;
+  currentTaskId = isEdit ? task?.id ?? null : null;
+  pendingFiles = [];
+
   const titleEl = modalEl.querySelector('[data-task-modal-title]');
   const submitBtn = modalEl.querySelector('[data-task-submit]');
   const form = modalEl.querySelector('[data-task-form]');
@@ -133,6 +362,15 @@ export function openTaskModal({
   form.description.value = task?.description ?? '';
   form.dueDate.value = task?.due_date ?? '';
   form.done.checked = Boolean(task?.done);
+
+  renderPendingAttachments();
+
+  if (isEdit && currentTaskId) {
+    loadEditAttachments();
+  } else {
+    modalEl.querySelector('[data-attachment-list]').innerHTML = '';
+    modalEl.querySelector('[data-attachment-empty]')?.classList.remove('d-none');
+  }
 
   submitHandler = onSubmit;
   modalInstance.show();

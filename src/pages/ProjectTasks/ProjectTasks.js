@@ -11,9 +11,10 @@ import {
   toggleTaskDone,
   updateTask,
 } from '../../lib/api/tasks.js';
+import { uploadTaskAttachment } from '../../lib/api/attachments.js';
 import { initBoardDragDrop } from '../../components/BoardDragDrop/BoardDragDrop.js';
 import { openTaskModal, showDeleteTaskConfirm } from '../../components/TaskModal/TaskModal.js';
-import { escapeHtml, formatDueDate, getDueDateStatus } from '../../lib/utils.js';
+import { escapeHtml, formatDueDate, getDueDateStatus, truncate } from '../../lib/utils.js';
 import { navigate } from '../../router/router.js';
 import { toast } from '../../lib/toast.js';
 
@@ -202,14 +203,37 @@ export function render(container, params = {}) {
       stages: board.stages,
       defaultStageId: board.stages[0]?.id,
       onSubmit: async (values) => {
-        await createTask({
+        const task = await createTask({
           projectId,
           stageId: values.stageId,
           title: values.title,
           description: values.description,
           dueDate: values.dueDate,
         });
-        toast.success('Task created.');
+
+        const failedUploads = [];
+
+        for (const file of values.pendingFiles ?? []) {
+          try {
+            await uploadTaskAttachment(task.id, file);
+          } catch (error) {
+            failedUploads.push(truncate(file.name, 40));
+          }
+        }
+
+        if (failedUploads.length) {
+          toast.error(
+            `Task created, but ${failedUploads.length} file(s) failed to upload: ${failedUploads.join(', ')}.`
+          );
+          throw new Error('Partial attachment upload failure.');
+        }
+
+        if ((values.pendingFiles ?? []).length) {
+          toast.success('Task created with attachments.');
+        } else {
+          toast.success('Task created.');
+        }
+
         await loadBoard();
       },
     });

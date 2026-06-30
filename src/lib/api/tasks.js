@@ -1,4 +1,5 @@
 import { supabase } from '../supabase.js';
+import { deleteAllTaskAttachments } from './attachments.js';
 
 export async function fetchProjectBoard(projectId) {
   const { data, error } = await supabase
@@ -95,6 +96,8 @@ export async function updateTask(taskId, { title, description, stageId, done, po
 }
 
 export async function deleteTask(taskId) {
+  await deleteAllTaskAttachments(taskId);
+
   const { error } = await supabase.from('tasks').delete().eq('id', taskId);
   if (error) throw error;
 }
