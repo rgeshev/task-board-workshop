@@ -3,13 +3,13 @@
     <div class="col-lg-5 d-none d-lg-block">
       <span class="tb-eyebrow mb-4">
         <i class="bi bi-stars"></i>
-        Welcome back
+        <span data-login-side-eyebrow>Welcome back</span>
       </span>
       <h1 class="login-page__headline">
-        Pick up right where you
-        <span class="text-gradient">left off</span>
+        <span data-login-side-title>Pick up right where you</span>
+        <span class="text-gradient" data-login-side-highlight>left off</span>
       </h1>
-      <p class="text-soft fs-5 mb-4">
+      <p class="text-soft fs-5 mb-4" data-login-side-text>
         Sign in to open your boards, move tasks across stages and keep your
         projects flowing.
       </p>
@@ -24,32 +24,111 @@
       <div class="card p-4 p-sm-5">
         <div class="text-center mb-4">
           <span class="login-page__logo"><i class="bi bi-kanban-fill"></i></span>
-          <h2 class="h4 mt-3 mb-1">Login to your account</h2>
-          <p class="text-soft small mb-0">Manage your projects in seconds</p>
+          <h2 class="h4 mt-3 mb-1" data-form-title>Login to your account</h2>
+          <p class="text-soft small mb-0" data-form-subtitle>Manage your projects in seconds</p>
         </div>
 
-        <form>
+        <div class="login-page__tabs mb-4" role="tablist">
+          <button type="button" class="login-page__tab active" data-mode="login" role="tab" aria-selected="true">
+            Login
+          </button>
+          <button type="button" class="login-page__tab" data-mode="register" role="tab" aria-selected="false">
+            Register
+          </button>
+        </div>
+
+        <div class="alert d-none" role="alert" data-auth-alert></div>
+
+        <form data-login-form novalidate>
           <div class="mb-3">
-            <label class="form-label small text-soft" for="email">Email</label>
+            <label class="form-label small text-soft" for="login-email">Email</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-              <input type="email" class="form-control" id="email" placeholder="you@example.com" />
+              <input
+                type="email"
+                class="form-control"
+                id="login-email"
+                name="email"
+                placeholder="you@example.com"
+                required
+                autocomplete="email"
+              />
             </div>
           </div>
           <div class="mb-4">
-            <label class="form-label small text-soft" for="password">Password</label>
+            <label class="form-label small text-soft" for="login-password">Password</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-lock"></i></span>
-              <input type="password" class="form-control" id="password" placeholder="••••••••" />
+              <input
+                type="password"
+                class="form-control"
+                id="login-password"
+                name="password"
+                placeholder="••••••••"
+                required
+                minlength="6"
+                autocomplete="current-password"
+              />
             </div>
           </div>
-          <button type="submit" class="btn btn-gradient w-100 btn-lg mb-3">
+          <button type="submit" class="btn btn-gradient w-100 btn-lg" data-submit-btn>
             <i class="bi bi-box-arrow-in-right me-2"></i>
             Login to manage your projects
           </button>
-          <p class="text-center text-soft small mb-0">
-            New here? <a href="#" class="login-page__link">Create an account</a>
-          </p>
+        </form>
+
+        <form class="d-none" data-register-form novalidate>
+          <div class="mb-3">
+            <label class="form-label small text-soft" for="register-email">Email</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+              <input
+                type="email"
+                class="form-control"
+                id="register-email"
+                name="email"
+                placeholder="you@example.com"
+                required
+                autocomplete="email"
+              />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-soft" for="register-password">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              <input
+                type="password"
+                class="form-control"
+                id="register-password"
+                name="password"
+                placeholder="At least 6 characters"
+                required
+                minlength="6"
+                autocomplete="new-password"
+              />
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label small text-soft" for="register-confirm">Confirm password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+              <input
+                type="password"
+                class="form-control"
+                id="register-confirm"
+                name="confirm"
+                placeholder="Repeat password"
+                required
+                minlength="6"
+                autocomplete="new-password"
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-gradient w-100 btn-lg" data-submit-btn>
+            <i class="bi bi-person-plus me-2"></i>
+            Create your account
+          </button>
         </form>
       </div>
     </div>

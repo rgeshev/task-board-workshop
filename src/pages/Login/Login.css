@@ -61,3 +61,34 @@
 .login-page__link:hover {
   text-decoration: underline;
 }
+
+.login-page__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--tb-border);
+}
+
+.login-page__tab {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  color: var(--tb-muted);
+  background: transparent;
+  transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-page__tab:hover {
+  color: var(--tb-text);
+}
+
+.login-page__tab.active {
+  color: #0a0f1f;
+  background: var(--tb-grad-brand);
+  box-shadow: 0 8px 24px -10px rgba(139, 92, 255, 0.8);
+}
+

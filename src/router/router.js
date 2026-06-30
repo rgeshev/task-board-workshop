@@ -1,4 +1,7 @@
 import { getPageContentContainer, initLayout } from '../components/layout/AppLayout/AppLayout.js';
+import { getSession } from '../lib/auth.js';
+import { refreshHeaderAuth } from '../components/layout/Header/Header.js';
+import { registerNavigator } from '../lib/navigation.js';
 
 const routes = [
   {
@@ -7,14 +10,17 @@ const routes = [
   },
   {
     path: '/login',
+    guestOnly: true,
     load: () => import('../pages/Login/Login.js'),
   },
   {
     path: '/dashboard',
+    requiresAuth: true,
     load: () => import('../pages/Dashboard/Dashboard.js'),
   },
   {
     path: '/projects/:id/tasks',
+    requiresAuth: true,
     load: () => import('../pages/ProjectTasks/ProjectTasks.js'),
   },
 ];
@@ -63,6 +69,19 @@ async function navigate(path, { replace = false } = {}) {
     return;
   }
 
+  const session = await getSession();
+  const normalizedPath = path.replace(/\/+$/, '') || '/';
+
+  if (match.route.requiresAuth && !session) {
+    await navigate('/login', { replace: true });
+    return;
+  }
+
+  if (match.route.guestOnly && session) {
+    await navigate('/dashboard', { replace: true });
+    return;
+  }
+
   if (currentPageCleanup) {
     currentPageCleanup();
     currentPageCleanup = null;
@@ -75,12 +94,13 @@ async function navigate(path, { replace = false } = {}) {
   currentPageCleanup = pageModule.render(contentContainer, match.params);
 
   if (replace) {
-    history.replaceState({ path }, '', path);
+    history.replaceState({ path: normalizedPath }, '', normalizedPath);
   } else {
-    history.pushState({ path }, '', path);
+    history.pushState({ path: normalizedPath }, '', normalizedPath);
   }
 
-  updateActiveNavLink(path);
+  updateActiveNavLink(normalizedPath);
+  refreshHeaderAuth();
 }
 
 function updateActiveNavLink(path) {
@@ -112,6 +132,7 @@ function handleLinkClick(event) {
 }
 
 export function initRouter() {
+  registerNavigator(navigate);
   initLayout();
 
   document.addEventListener('click', handleLinkClick);
