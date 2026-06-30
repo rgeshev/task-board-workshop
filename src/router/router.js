@@ -35,7 +35,7 @@ const routes = [
     load: () => import('../pages/ProjectForm/ProjectForm.js'),
   },
   {
-    path: '/projects/:id/tasks',
+    path: '/project/:id/tasks',
     requiresAuth: true,
     load: () => import('../pages/ProjectTasks/ProjectTasks.js'),
   },

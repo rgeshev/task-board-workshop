@@ -21,7 +21,7 @@ function renderRow(project) {
       <td class="text-center">${project.doneTaskCount}</td>
       <td class="text-end">
         <div class="projects-table__actions">
-          <a href="/projects/${project.id}/tasks" data-router-link class="btn btn-sm btn-glass">
+          <a href="/project/${project.id}/tasks" data-router-link class="btn btn-sm btn-glass">
             View Tasks
           </a>
           <a href="/project/${project.id}/edit" data-router-link class="btn btn-sm btn-glass" title="Edit">

@@ -22,6 +22,7 @@
 
   --tb-shadow-glow: 0 18px 50px -12px rgba(91, 141, 239, 0.55);
   --tb-radius: 18px;
+  --tb-content-max-width: 1280px;
 
   --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
@@ -55,6 +56,13 @@ body {
 
 .app-main {
   flex: 1;
+}
+
+.app-container {
+  width: 100%;
+  max-width: var(--tb-content-max-width);
+  margin-inline: auto;
+  padding-inline: calc(var(--bs-gutter-x, 1.5rem) * 0.5);
 }
 
 h1,
