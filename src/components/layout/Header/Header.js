@@ -2,6 +2,7 @@ import template from './Header.html?raw';
 import './Header.css';
 import { getSession, signOut } from '../../../lib/auth.js';
 import { go } from '../../../lib/navigation.js';
+import { toast } from '../../../lib/toast.js';
 
 let logoutHandler = null;
 
@@ -29,7 +30,7 @@ function renderAuthSlot(slot, session) {
         await signOut();
         go('/');
       } catch (error) {
-        console.error(error);
+        toast.fromError(error, 'Could not log out. Please try again.');
         btn.disabled = false;
       }
     };

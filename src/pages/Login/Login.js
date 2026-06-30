@@ -2,6 +2,7 @@ import template from './Login.html?raw';
 import './Login.css';
 import { signIn, signUp } from '../../lib/auth.js';
 import { navigate } from '../../router/router.js';
+import { toast } from '../../lib/toast.js';
 
 const COPY = {
   login: {
@@ -43,21 +44,6 @@ function setMode(container, mode) {
   container.querySelector('[data-login-side-title]').textContent = copy.sideTitle;
   container.querySelector('[data-login-side-highlight]').textContent = copy.sideHighlight;
   container.querySelector('[data-login-side-text]').textContent = copy.sideText;
-
-  hideAlert(container);
-}
-
-function showAlert(container, message, type = 'danger') {
-  const alert = container.querySelector('[data-auth-alert]');
-  alert.className = `alert alert-${type}`;
-  alert.textContent = message;
-  alert.classList.remove('d-none');
-}
-
-function hideAlert(container) {
-  const alert = container.querySelector('[data-auth-alert]');
-  alert.classList.add('d-none');
-  alert.textContent = '';
 }
 
 function setLoading(form, loading) {
@@ -85,14 +71,13 @@ export function render(container) {
 
   const onLoginSubmit = async (event) => {
     event.preventDefault();
-    hideAlert(container);
 
     const form = event.currentTarget;
     const email = form.email.value.trim();
     const password = form.password.value;
 
     if (!email || !password) {
-      showAlert(container, 'Please enter your email and password.');
+      toast.error('Please enter your email and password.');
       return;
     }
 
@@ -102,7 +87,7 @@ export function render(container) {
       await signIn(email, password);
       navigate('/dashboard');
     } catch (error) {
-      showAlert(container, error.message || 'Login failed. Please try again.');
+      toast.fromError(error, 'Login failed. Please try again.');
     } finally {
       setLoading(form, false);
     }
@@ -110,7 +95,6 @@ export function render(container) {
 
   const onRegisterSubmit = async (event) => {
     event.preventDefault();
-    hideAlert(container);
 
     const form = event.currentTarget;
     const email = form.email.value.trim();
@@ -118,17 +102,17 @@ export function render(container) {
     const confirm = form.confirm.value;
 
     if (!email || !password) {
-      showAlert(container, 'Please fill in all fields.');
+      toast.error('Please fill in all fields.');
       return;
     }
 
     if (password.length < 6) {
-      showAlert(container, 'Password must be at least 6 characters.');
+      toast.error('Password must be at least 6 characters.');
       return;
     }
 
     if (password !== confirm) {
-      showAlert(container, 'Passwords do not match.');
+      toast.error('Passwords do not match.');
       return;
     }
 
@@ -142,15 +126,11 @@ export function render(container) {
         return;
       }
 
-      showAlert(
-        container,
-        'Account created! Check your email to confirm, then log in.',
-        'success'
-      );
+      toast.success('Account created! Check your email to confirm, then log in.');
       setMode(container, 'login');
       form.reset();
     } catch (error) {
-      showAlert(container, error.message || 'Registration failed. Please try again.');
+      toast.fromError(error, 'Registration failed. Please try again.');
     } finally {
       setLoading(form, false);
     }

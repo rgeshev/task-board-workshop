@@ -5,6 +5,8 @@ import './styles/global.css';
 import { initAuthListener } from './lib/auth.js';
 import { refreshHeaderAuth } from './components/layout/Header/Header.js';
 import { initRouter } from './router/router.js';
+import { initToast } from './lib/toast.js';
 
+initToast();
 initAuthListener(refreshHeaderAuth);
 initRouter();
