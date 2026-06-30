@@ -24,6 +24,19 @@ const DEFAULT_STAGES = [
   { name: 'Done', position: 2 },
 ];
 
+function dueDateFromOffset(dayOffset) {
+  if (dayOffset == null) return null;
+
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + dayOffset);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 const SAMPLE_TASKS = [
   {
     title: 'Define project goals',
@@ -31,6 +44,7 @@ const SAMPLE_TASKS = [
     stageIndex: 0,
     done: false,
     position: 0,
+    dueDateOffset: -2,
   },
   {
     title: 'Research competitors',
@@ -38,6 +52,7 @@ const SAMPLE_TASKS = [
     stageIndex: 0,
     done: false,
     position: 1,
+    dueDateOffset: 0,
   },
   {
     title: 'Draft wireframes',
@@ -45,6 +60,7 @@ const SAMPLE_TASKS = [
     stageIndex: 0,
     done: false,
     position: 2,
+    dueDateOffset: 3,
   },
   {
     title: 'Set up development environment',
@@ -52,6 +68,7 @@ const SAMPLE_TASKS = [
     stageIndex: 0,
     done: false,
     position: 3,
+    dueDateOffset: null,
   },
   {
     title: 'Build authentication flow',
@@ -59,6 +76,7 @@ const SAMPLE_TASKS = [
     stageIndex: 1,
     done: false,
     position: 0,
+    dueDateOffset: 5,
   },
   {
     title: 'Design database schema',
@@ -66,6 +84,7 @@ const SAMPLE_TASKS = [
     stageIndex: 1,
     done: false,
     position: 1,
+    dueDateOffset: 7,
   },
   {
     title: 'Implement project listing',
@@ -73,6 +92,7 @@ const SAMPLE_TASKS = [
     stageIndex: 1,
     done: false,
     position: 2,
+    dueDateOffset: 14,
   },
   {
     title: 'Add task drag-and-drop',
@@ -80,6 +100,7 @@ const SAMPLE_TASKS = [
     stageIndex: 1,
     done: false,
     position: 3,
+    dueDateOffset: null,
   },
   {
     title: 'Initialize Git repository',
@@ -87,6 +108,7 @@ const SAMPLE_TASKS = [
     stageIndex: 2,
     done: true,
     position: 0,
+    dueDateOffset: -5,
   },
   {
     title: 'Create project scaffold',
@@ -94,6 +116,7 @@ const SAMPLE_TASKS = [
     stageIndex: 2,
     done: true,
     position: 1,
+    dueDateOffset: -3,
   },
   {
     title: 'Configure Supabase connection',
@@ -101,6 +124,7 @@ const SAMPLE_TASKS = [
     stageIndex: 2,
     done: true,
     position: 2,
+    dueDateOffset: 0,
   },
   {
     title: 'Write seed script',
@@ -108,6 +132,7 @@ const SAMPLE_TASKS = [
     stageIndex: 2,
     done: true,
     position: 3,
+    dueDateOffset: null,
   },
 ];
 
@@ -202,6 +227,7 @@ async function createTasks(projectId, stages, userIndex) {
     description: task.description,
     position: task.position,
     done: task.done,
+    due_date: dueDateFromOffset(task.dueDateOffset),
   }));
 
   const { error } = await supabase.from('tasks').insert(tasks);

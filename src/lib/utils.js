@@ -13,3 +13,71 @@ export function truncate(text, maxLength = 80) {
   if (value.length <= maxLength) return value;
   return `${value.slice(0, maxLength).trimEnd()}…`;
 }
+
+function toDateOnly(value) {
+  if (!value) return null;
+  return String(value).slice(0, 10);
+}
+
+export function todayDateString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export function formatDueDate(dateStr) {
+  const normalized = toDateOnly(dateStr);
+  if (!normalized) return '';
+
+  const [year, month, day] = normalized.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date);
+}
+
+export function getDueDateStatus(dueDate, done = false) {
+  const normalized = toDateOnly(dueDate);
+  if (!normalized) return 'none';
+
+  const today = todayDateString();
+  if (normalized < today && !done) return 'overdue';
+  if (normalized === today) return 'today';
+
+  const [year, month, day] = normalized.split('-').map(Number);
+  const due = new Date(year, month - 1, day);
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+
+  const weekEnd = new Date(todayDate);
+  weekEnd.setDate(weekEnd.getDate() + 7);
+
+  if (due <= weekEnd) return 'soon';
+  return 'later';
+}
+
+const DEADLINE_GROUPS = [
+  { key: 'overdue', label: 'Overdue', icon: 'bi-exclamation-circle' },
+  { key: 'today', label: 'Due today', icon: 'bi-calendar-check' },
+  { key: 'soon', label: 'This week', icon: 'bi-calendar-week' },
+  { key: 'later', label: 'Later', icon: 'bi-calendar-event' },
+  { key: 'none', label: 'No deadline', icon: 'bi-calendar-x' },
+];
+
+export function groupTasksByDeadline(tasks) {
+  const buckets = Object.fromEntries(DEADLINE_GROUPS.map((group) => [group.key, []]));
+
+  tasks.forEach((task) => {
+    const status = getDueDateStatus(task.due_date, task.done);
+    buckets[status].push(task);
+  });
+
+  return DEADLINE_GROUPS.map((group) => ({
+    ...group,
+    tasks: buckets[group.key],
+  })).filter((group) => group.tasks.length > 0);
+}

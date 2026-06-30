@@ -39,6 +39,11 @@ const routes = [
     requiresAuth: true,
     load: () => import('../pages/ProjectTasks/ProjectTasks.js'),
   },
+  {
+    path: '/deadlines',
+    requiresAuth: true,
+    load: () => import('../pages/Deadlines/Deadlines.js'),
+  },
 ];
 
 let currentPageCleanup = null;

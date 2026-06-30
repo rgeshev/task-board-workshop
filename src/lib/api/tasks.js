@@ -18,7 +18,8 @@ export async function fetchProjectBoard(projectId) {
         description,
         position,
         done,
-        stage_id
+        stage_id,
+        due_date
       )
     `)
     .eq('id', projectId)
@@ -51,7 +52,7 @@ async function nextTaskPosition(stageId) {
   return data?.length ? data[0].position + 1 : 0;
 }
 
-export async function createTask({ projectId, stageId, title, description }) {
+export async function createTask({ projectId, stageId, title, description, dueDate }) {
   const position = await nextTaskPosition(stageId);
 
   const { data, error } = await supabase
@@ -61,17 +62,18 @@ export async function createTask({ projectId, stageId, title, description }) {
       stage_id: stageId,
       title: title.trim(),
       description: description?.trim() || null,
+      due_date: dueDate || null,
       position,
       done: false,
     })
-    .select('id, title, description, position, done, stage_id')
+    .select('id, title, description, position, done, stage_id, due_date')
     .single();
 
   if (error) throw error;
   return data;
 }
 
-export async function updateTask(taskId, { title, description, stageId, done, position }) {
+export async function updateTask(taskId, { title, description, stageId, done, position, dueDate }) {
   const payload = {};
 
   if (title != null) payload.title = title.trim();
@@ -79,12 +81,13 @@ export async function updateTask(taskId, { title, description, stageId, done, po
   if (stageId != null) payload.stage_id = stageId;
   if (done != null) payload.done = done;
   if (position != null) payload.position = position;
+  if (dueDate !== undefined) payload.due_date = dueDate || null;
 
   const { data, error } = await supabase
     .from('tasks')
     .update(payload)
     .eq('id', taskId)
-    .select('id, title, description, position, done, stage_id')
+    .select('id, title, description, position, done, stage_id, due_date')
     .single();
 
   if (error) throw error;
@@ -150,6 +153,42 @@ export function isMoveNoOp(board, updates) {
     const task = board.tasks.find((item) => item.id === update.id);
     return task && task.stage_id === update.stage_id && task.position === update.position;
   });
+}
+
+export async function fetchTasksByDeadline() {
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(`
+      id,
+      title,
+      description,
+      done,
+      due_date,
+      stage_id,
+      project_id,
+      projects (
+        id,
+        title
+      ),
+      project_stages (
+        name
+      )
+    `)
+    .order('due_date', { ascending: true, nullsFirst: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((task) => ({
+    id: task.id,
+    title: task.title,
+    description: task.description,
+    done: task.done,
+    due_date: task.due_date,
+    stage_id: task.stage_id,
+    project_id: task.project_id,
+    projectTitle: task.projects?.title ?? 'Unknown project',
+    stageName: task.project_stages?.name ?? 'Unknown stage',
+  }));
 }
 
 export async function applyTaskOrder(updates) {

@@ -126,6 +126,32 @@
   word-break: break-word;
 }
 
+.board__task-due {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--tb-border);
+  background: var(--tb-surface-strong);
+  color: var(--tb-muted);
+}
+
+.board__task-due--overdue {
+  color: #ff8f8f;
+  border-color: rgba(255, 99, 99, 0.35);
+  background: rgba(255, 99, 99, 0.12);
+}
+
+.board__task-due--today {
+  color: var(--tb-amber);
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.12);
+}
+
 .board__empty {
   padding: 0.5rem 0;
 }

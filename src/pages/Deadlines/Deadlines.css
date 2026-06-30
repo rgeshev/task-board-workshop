@@ -1,0 +1,139 @@
+.deadlines-page {
+  padding-block: 0.5rem 2rem;
+}
+
+.deadlines-page__title {
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  font-weight: 800;
+}
+
+.deadlines-page__empty-icon {
+  font-size: 2.5rem;
+  color: var(--tb-muted);
+}
+
+.deadlines-page__group + .deadlines-page__group {
+  margin-top: 1.75rem;
+}
+
+.deadlines-page__group-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.deadlines-page__group-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.deadlines-page__group-count {
+  font-size: 0.8rem;
+  color: var(--tb-muted);
+  background: var(--tb-surface-strong);
+  border: 1px solid var(--tb-border);
+  border-radius: 999px;
+  padding: 0.05rem 0.6rem;
+}
+
+.deadlines-page__group--overdue .deadlines-page__group-title {
+  color: #ff8f8f;
+}
+
+.deadlines-page__group--today .deadlines-page__group-title {
+  color: var(--tb-amber);
+}
+
+.deadlines-table-wrap {
+  border: 1px solid var(--tb-border);
+  border-radius: var(--tb-radius);
+  overflow: hidden;
+}
+
+.deadlines-table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--tb-text);
+  --bs-table-border-color: var(--tb-border);
+  margin-bottom: 0;
+}
+
+.deadlines-table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tb-muted);
+  font-weight: 600;
+  border-bottom-width: 1px;
+  white-space: nowrap;
+}
+
+.deadlines-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.deadlines-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.deadlines-table__task-title {
+  font-weight: 600;
+}
+
+.deadlines-table__task--done .deadlines-table__task-title {
+  text-decoration: line-through;
+  color: var(--tb-muted);
+}
+
+.deadlines-table__due {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--tb-border);
+  background: var(--tb-surface-strong);
+  color: var(--tb-muted);
+  white-space: nowrap;
+}
+
+.deadlines-table__due--overdue {
+  color: #ff8f8f;
+  border-color: rgba(255, 99, 99, 0.35);
+  background: rgba(255, 99, 99, 0.12);
+}
+
+.deadlines-table__due--today {
+  color: var(--tb-amber);
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.deadlines-table__project-link {
+  color: var(--tb-cyan);
+  text-decoration: none;
+}
+
+.deadlines-table__project-link:hover {
+  text-decoration: underline;
+}
+
+.deadlines-table__status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--tb-border);
+  background: var(--tb-surface-strong);
+  color: var(--tb-muted);
+}
+
+.deadlines-table__status--done {
+  color: var(--tb-green);
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.12);
+}

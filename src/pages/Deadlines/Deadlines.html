@@ -1,0 +1,24 @@
+<section class="deadlines-page">
+  <div class="mb-4">
+    <span class="tb-eyebrow mb-2"><i class="bi bi-calendar-event"></i> Deadlines</span>
+    <h1 class="deadlines-page__title mt-2 mb-1">Tasks by deadline</h1>
+    <p class="text-soft mb-0">All tasks across your projects, grouped by due date.</p>
+  </div>
+
+  <div class="deadlines-page__loading text-soft mb-4 d-none" data-deadlines-loading>
+    <span class="spinner-border spinner-border-sm me-2"></span>Loading tasks…
+  </div>
+
+  <div class="deadlines-page__content d-none" data-deadlines-content></div>
+
+  <div class="card p-5 text-center d-none" data-deadlines-empty>
+    <div class="deadlines-page__empty-icon mb-3">
+      <i class="bi bi-calendar-x"></i>
+    </div>
+    <h2 class="h5 mb-2">No tasks yet</h2>
+    <p class="text-soft mb-4">Create tasks on a project board and set due dates to see them here.</p>
+    <a href="/projects" data-router-link class="btn btn-gradient">
+      <i class="bi bi-folder2-open me-1"></i> Go to projects
+    </a>
+  </div>
+</section>

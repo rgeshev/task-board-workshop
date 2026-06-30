@@ -35,6 +35,13 @@ function ensureModal() {
               <textarea class="form-control" id="task-description" name="description" rows="3"></textarea>
             </div>
             <div class="mb-3">
+              <label class="form-label small text-soft" for="task-due-date">Due date</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                <input type="date" class="form-control" id="task-due-date" name="dueDate" />
+              </div>
+            </div>
+            <div class="mb-3">
               <label class="form-label small text-soft" for="task-stage">Stage</label>
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-columns-gap"></i></span>
@@ -71,6 +78,7 @@ function ensureModal() {
         title: form.title.value.trim(),
         description: form.description.value.trim(),
         stageId: form.stageId.value,
+        dueDate: form.dueDate.value || null,
         done: form.done.checked,
       };
 
@@ -123,6 +131,7 @@ export function openTaskModal({
 
   form.title.value = task?.title ?? '';
   form.description.value = task?.description ?? '';
+  form.dueDate.value = task?.due_date ?? '';
   form.done.checked = Boolean(task?.done);
 
   submitHandler = onSubmit;

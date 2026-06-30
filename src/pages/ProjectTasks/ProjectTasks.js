@@ -13,7 +13,7 @@ import {
 } from '../../lib/api/tasks.js';
 import { initBoardDragDrop } from '../../components/BoardDragDrop/BoardDragDrop.js';
 import { openTaskModal, showDeleteTaskConfirm } from '../../components/TaskModal/TaskModal.js';
-import { escapeHtml } from '../../lib/utils.js';
+import { escapeHtml, formatDueDate, getDueDateStatus } from '../../lib/utils.js';
 import { navigate } from '../../router/router.js';
 import { toast } from '../../lib/toast.js';
 
@@ -29,10 +29,31 @@ function tasksForStage(tasks, stageId) {
     .sort((a, b) => a.position - b.position);
 }
 
+function renderDueBadge(task) {
+  if (!task.due_date) return '';
+
+  const status = getDueDateStatus(task.due_date, task.done);
+  const label = formatDueDate(task.due_date);
+  const statusClass =
+    status === 'overdue'
+      ? 'board__task-due--overdue'
+      : status === 'today'
+        ? 'board__task-due--today'
+        : 'board__task-due--default';
+
+  return `
+    <span class="board__task-due ${statusClass}">
+      <i class="bi bi-calendar-event"></i>
+      ${escapeHtml(label)}
+    </span>
+  `;
+}
+
 function renderTaskCard(task) {
   const description = task.description
     ? `<p class="board__task-desc text-soft small mb-0">${escapeHtml(task.description)}</p>`
     : '';
+  const dueBadge = renderDueBadge(task);
 
   return `
     <article
@@ -54,6 +75,7 @@ function renderTaskCard(task) {
           </button>
         </div>
       </div>
+      ${dueBadge}
       ${description}
     </article>
   `;
@@ -185,6 +207,7 @@ export function render(container, params = {}) {
           stageId: values.stageId,
           title: values.title,
           description: values.description,
+          dueDate: values.dueDate,
         });
         toast.success('Task created.');
         await loadBoard();
@@ -231,6 +254,7 @@ export function render(container, params = {}) {
             description: values.description,
             stageId: values.stageId,
             done: values.done,
+            dueDate: values.dueDate,
           });
           toast.success('Task updated.');
           await loadBoard();
