@@ -6,6 +6,7 @@ import { registerNavigator } from '../lib/navigation.js';
 const routes = [
   {
     path: '/',
+    guestOnly: true,
     load: () => import('../pages/Home/Home.js'),
   },
   {
@@ -17,6 +18,11 @@ const routes = [
     path: '/dashboard',
     requiresAuth: true,
     load: () => import('../pages/Dashboard/Dashboard.js'),
+  },
+  {
+    path: '/projects',
+    requiresAuth: true,
+    load: () => import('../pages/Projects/Projects.js'),
   },
   {
     path: '/projects/:id/tasks',

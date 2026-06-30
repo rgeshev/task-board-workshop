@@ -12,6 +12,11 @@ function renderAuthSlot(slot, session) {
     item.classList.toggle('d-none', !session);
   });
 
+  const guestItems = document.querySelectorAll('[data-auth-guest]');
+  guestItems.forEach((item) => {
+    item.classList.toggle('d-none', Boolean(session));
+  });
+
   if (session) {
     const email = session.user.email ?? 'Account';
     slot.innerHTML = `

@@ -1,0 +1,26 @@
+<section class="projects-page">
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+    <div>
+      <span class="tb-eyebrow mb-2"><i class="bi bi-folder2-open"></i> Projects</span>
+      <h1 class="projects-page__title mt-2 mb-1">Your projects</h1>
+      <p class="text-soft mb-0">Open a board to manage tasks and stages.</p>
+    </div>
+    <a href="/dashboard" data-router-link class="btn btn-glass align-self-start">
+      <i class="bi bi-grid-1x2 me-1"></i> Dashboard
+    </a>
+  </div>
+
+  <div class="projects-page__loading text-soft mb-4 d-none" data-projects-loading>
+    <span class="spinner-border spinner-border-sm me-2"></span>Loading projects…
+  </div>
+
+  <div class="row g-4" data-projects-list></div>
+
+  <div class="card p-5 text-center d-none" data-projects-empty>
+    <div class="projects-page__empty-icon mb-3">
+      <i class="bi bi-folder-plus"></i>
+    </div>
+    <h2 class="h5 mb-2">No projects yet</h2>
+    <p class="text-soft mb-0">Your projects will appear here once created.</p>
+  </div>
+</section>
