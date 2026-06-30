@@ -25,6 +25,16 @@ const routes = [
     load: () => import('../pages/Projects/Projects.js'),
   },
   {
+    path: '/project/add',
+    requiresAuth: true,
+    load: () => import('../pages/ProjectForm/ProjectForm.js'),
+  },
+  {
+    path: '/project/:id/edit',
+    requiresAuth: true,
+    load: () => import('../pages/ProjectForm/ProjectForm.js'),
+  },
+  {
     path: '/projects/:id/tasks',
     requiresAuth: true,
     load: () => import('../pages/ProjectTasks/ProjectTasks.js'),
@@ -116,6 +126,7 @@ function updateActiveNavLink(path) {
     const linkPath = link.getAttribute('data-nav-link');
     const isActive =
       normalizedPath === linkPath ||
+      (linkPath === '/projects' && normalizedPath.startsWith('/project')) ||
       (linkPath !== '/' && normalizedPath.startsWith(linkPath));
 
     link.classList.toggle('active', isActive);

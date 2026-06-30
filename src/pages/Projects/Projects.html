@@ -3,10 +3,10 @@
     <div>
       <span class="tb-eyebrow mb-2"><i class="bi bi-folder2-open"></i> Projects</span>
       <h1 class="projects-page__title mt-2 mb-1">Your projects</h1>
-      <p class="text-soft mb-0">Open a board to manage tasks and stages.</p>
+      <p class="text-soft mb-0">Manage boards, stages and tasks.</p>
     </div>
-    <a href="/dashboard" data-router-link class="btn btn-glass align-self-start">
-      <i class="bi bi-grid-1x2 me-1"></i> Dashboard
+    <a href="/project/add" data-router-link class="btn btn-gradient align-self-start">
+      <i class="bi bi-plus-lg me-1"></i> Add project
     </a>
   </div>
 
@@ -14,13 +14,32 @@
     <span class="spinner-border spinner-border-sm me-2"></span>Loading projects…
   </div>
 
-  <div class="row g-4" data-projects-list></div>
+  <div class="card projects-table-wrap d-none" data-projects-table-wrap>
+    <div class="table-responsive">
+      <table class="table projects-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col" class="text-center">Stages</th>
+            <th scope="col" class="text-center">Open Tasks</th>
+            <th scope="col" class="text-center">Tasks Done</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody data-projects-tbody></tbody>
+      </table>
+    </div>
+  </div>
 
   <div class="card p-5 text-center d-none" data-projects-empty>
     <div class="projects-page__empty-icon mb-3">
       <i class="bi bi-folder-plus"></i>
     </div>
     <h2 class="h5 mb-2">No projects yet</h2>
-    <p class="text-soft mb-0">Your projects will appear here once created.</p>
+    <p class="text-soft mb-4">Create your first project to start organizing tasks.</p>
+    <a href="/project/add" data-router-link class="btn btn-gradient">
+      <i class="bi bi-plus-lg me-1"></i> Add project
+    </a>
   </div>
 </section>

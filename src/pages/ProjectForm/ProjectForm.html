@@ -1,0 +1,61 @@
+<section class="project-form-page">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="/projects" data-router-link>Projects</a></li>
+      <li class="breadcrumb-item active" aria-current="page" data-form-breadcrumb>Add project</li>
+    </ol>
+  </nav>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+      <div class="card p-4 p-sm-5">
+        <div class="mb-4">
+          <span class="tb-eyebrow mb-2"><i class="bi bi-folder-plus"></i> <span data-form-eyebrow>New project</span></span>
+          <h1 class="project-form-page__title mt-2 mb-1" data-form-title>Add project</h1>
+          <p class="text-soft mb-0" data-form-subtitle>Create a new board with default stages.</p>
+        </div>
+
+        <div class="project-form-page__loading text-soft mb-4 d-none" data-form-loading>
+          <span class="spinner-border spinner-border-sm me-2"></span>Loading project…
+        </div>
+
+        <form data-project-form novalidate>
+          <div class="mb-3">
+            <label class="form-label small text-soft" for="project-title">Title</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                id="project-title"
+                name="title"
+                placeholder="My project"
+                required
+                maxlength="120"
+              />
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small text-soft" for="project-description">Description</label>
+            <textarea
+              class="form-control"
+              id="project-description"
+              name="description"
+              rows="4"
+              placeholder="What is this project about?"
+            ></textarea>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-gradient" data-submit-btn>
+              <i class="bi bi-check-lg me-1"></i>
+              <span data-submit-label>Save project</span>
+            </button>
+            <a href="/projects" data-router-link class="btn btn-glass">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

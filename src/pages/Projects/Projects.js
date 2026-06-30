@@ -1,48 +1,51 @@
 import template from './Projects.html?raw';
 import './Projects.css';
-import { fetchProjects } from '../../lib/api/projects.js';
+import { deleteProject, fetchProjectsWithStats } from '../../lib/api/projects.js';
+import { showDeleteConfirm } from '../../components/ConfirmModal/ConfirmModal.js';
+import { escapeHtml, truncate } from '../../lib/utils.js';
+import { navigate } from '../../router/router.js';
 import { toast } from '../../lib/toast.js';
 
-const ICONS = ['bi-rocket-takeoff', 'bi-phone', 'bi-megaphone', 'bi-palette', 'bi-code-slash'];
-const COLORS = ['var(--tb-violet)', 'var(--tb-cyan)', 'var(--tb-green)', 'var(--tb-amber)', 'var(--tb-pink)'];
-
-function escapeHtml(text) {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function renderProjectCard(project, index) {
-  const icon = ICONS[index % ICONS.length];
-  const color = COLORS[index % COLORS.length];
-  const description = project.description
-    ? `<p class="text-soft small mb-0">${escapeHtml(project.description)}</p>`
-    : '<p class="text-soft small mb-0">No description</p>';
+function renderRow(project) {
+  const shortDescription = project.description ? truncate(project.description, 80) : '—';
+  const descriptionTitle = project.description ? escapeHtml(project.description) : '';
 
   return `
-    <div class="col-md-6 col-xl-4">
-      <a href="/projects/${project.id}/tasks" data-router-link class="card tb-hover h-100 p-4 text-decoration-none projects-card">
-        <div class="projects-card__icon" style="--icon: ${color}">
-          <i class="bi ${icon}"></i>
+    <tr data-project-id="${project.id}">
+      <td class="projects-table__title">${escapeHtml(project.title)}</td>
+      <td class="projects-table__description text-soft" ${descriptionTitle ? `title="${descriptionTitle}"` : ''}>
+        ${escapeHtml(shortDescription)}
+      </td>
+      <td class="text-center">${project.stageCount}</td>
+      <td class="text-center">${project.openTaskCount}</td>
+      <td class="text-center">${project.doneTaskCount}</td>
+      <td class="text-end">
+        <div class="projects-table__actions">
+          <a href="/projects/${project.id}/tasks" data-router-link class="btn btn-sm btn-glass">
+            View Tasks
+          </a>
+          <a href="/project/${project.id}/edit" data-router-link class="btn btn-sm btn-glass" title="Edit">
+            <i class="bi bi-pencil"></i>
+          </a>
+          <button type="button" class="btn btn-sm btn-glass text-danger" data-delete-project title="Delete">
+            <i class="bi bi-trash"></i>
+          </button>
         </div>
-        <h3 class="h5 mt-3 mb-2">${escapeHtml(project.title)}</h3>
-        ${description}
-      </a>
-    </div>
+      </td>
+    </tr>
   `;
 }
 
 function setLoading(container, loading) {
   container.querySelector('[data-projects-loading]')?.classList.toggle('d-none', !loading);
-  container.querySelector('[data-projects-list]')?.classList.toggle('d-none', loading);
+  container.querySelector('[data-projects-table-wrap]')?.classList.toggle('d-none', loading);
 }
 
 export function render(container) {
   container.innerHTML = template;
 
-  const listEl = container.querySelector('[data-projects-list]');
+  const tableWrap = container.querySelector('[data-projects-table-wrap]');
+  const tbody = container.querySelector('[data-projects-tbody]');
   const emptyEl = container.querySelector('[data-projects-empty]');
   let cancelled = false;
 
@@ -51,19 +54,19 @@ export function render(container) {
     emptyEl.classList.add('d-none');
 
     try {
-      const projects = await fetchProjects();
+      const projects = await fetchProjectsWithStats();
       if (cancelled) return;
 
       if (projects.length === 0) {
-        listEl.innerHTML = '';
-        listEl.classList.add('d-none');
+        tbody.innerHTML = '';
+        tableWrap.classList.add('d-none');
         emptyEl.classList.remove('d-none');
         return;
       }
 
-      listEl.classList.remove('d-none');
+      tableWrap.classList.remove('d-none');
       emptyEl.classList.add('d-none');
-      listEl.innerHTML = projects.map((project, index) => renderProjectCard(project, index)).join('');
+      tbody.innerHTML = projects.map(renderRow).join('');
     } catch (error) {
       if (cancelled) return;
       toast.fromError(error, 'Could not load projects.');
@@ -74,9 +77,36 @@ export function render(container) {
     }
   }
 
+  const onTableClick = async (event) => {
+    const deleteBtn = event.target.closest('[data-delete-project]');
+    if (!deleteBtn) return;
+
+    const row = deleteBtn.closest('[data-project-id]');
+    if (!row) return;
+
+    const projectId = row.getAttribute('data-project-id');
+    const title = row.querySelector('.projects-table__title')?.textContent?.trim() ?? 'project';
+
+    const confirmed = await showDeleteConfirm({ itemName: title });
+    if (!confirmed) return;
+
+    deleteBtn.disabled = true;
+
+    try {
+      await deleteProject(projectId);
+      toast.success('Project deleted.');
+      await loadProjects();
+    } catch (error) {
+      toast.fromError(error, 'Could not delete project.');
+      deleteBtn.disabled = false;
+    }
+  };
+
+  tbody.addEventListener('click', onTableClick);
   loadProjects();
 
   return () => {
     cancelled = true;
+    tbody.removeEventListener('click', onTableClick);
   };
 }

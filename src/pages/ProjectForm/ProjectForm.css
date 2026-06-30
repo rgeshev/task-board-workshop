@@ -1,0 +1,27 @@
+.project-form-page {
+  padding-block: 0.5rem 2rem;
+}
+
+.project-form-page__title {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 800;
+}
+
+.project-form-page .input-group-text {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--tb-border);
+  color: var(--tb-muted);
+  border-radius: 12px 0 0 12px;
+}
+
+.project-form-page .form-control {
+  border-color: var(--tb-border);
+}
+
+.project-form-page textarea.form-control {
+  border-radius: 12px;
+}
+
+.project-form-page .input-group .form-control {
+  border-left: 0;
+}

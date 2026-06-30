@@ -7,20 +7,52 @@
   font-weight: 800;
 }
 
-.projects-card {
-  color: var(--tb-text);
+.projects-table-wrap {
+  overflow: hidden;
 }
 
-.projects-card__icon {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 13px;
-  font-size: 1.3rem;
-  color: var(--icon, var(--tb-violet));
-  background: color-mix(in srgb, var(--icon, var(--tb-violet)) 16%, transparent);
-  border: 1px solid color-mix(in srgb, var(--icon, var(--tb-violet)) 35%, transparent);
+.projects-table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--tb-text);
+  --bs-table-border-color: var(--tb-border);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.04);
+  margin-bottom: 0;
+}
+
+.projects-table thead th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tb-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 1rem 1.1rem;
+  border-bottom-width: 1px;
+}
+
+.projects-table tbody td {
+  padding: 1rem 1.1rem;
+  vertical-align: middle;
+}
+
+.projects-table__title {
+  font-weight: 600;
+  min-width: 140px;
+}
+
+.projects-table__description {
+  max-width: 320px;
+}
+
+.projects-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.projects-table__actions .btn {
+  white-space: nowrap;
 }
 
 .projects-page__empty-icon {
@@ -33,4 +65,56 @@
   color: var(--tb-muted);
   background: var(--tb-surface-strong);
   border: 1px solid var(--tb-border);
+}
+
+@media (max-width: 992px) {
+  .projects-table__description {
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .projects-table thead {
+    display: none;
+  }
+
+  .projects-table tbody tr {
+    display: block;
+    padding: 1rem;
+    border-bottom: 1px solid var(--tb-border);
+  }
+
+  .projects-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.35rem 0;
+    border: 0;
+  }
+
+  .projects-table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--tb-muted);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .projects-table tbody td.projects-table__title::before { content: 'Title'; }
+  .projects-table tbody td.projects-table__description::before { content: 'Description'; }
+  .projects-table tbody td:nth-child(3)::before { content: 'Stages'; }
+  .projects-table tbody td:nth-child(4)::before { content: 'Open Tasks'; }
+  .projects-table tbody td:nth-child(5)::before { content: 'Tasks Done'; }
+  .projects-table tbody td:nth-child(6)::before { content: 'Actions'; }
+
+  .projects-table tbody td:nth-child(6) {
+    justify-content: flex-start;
+    padding-top: 0.75rem;
+  }
+
+  .projects-table__actions {
+    justify-content: flex-start;
+  }
 }

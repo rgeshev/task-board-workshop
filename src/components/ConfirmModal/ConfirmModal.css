@@ -1,0 +1,33 @@
+.confirm-modal .modal-content {
+  background: rgba(14, 20, 40, 0.96);
+  border: 1px solid var(--tb-border);
+  border-radius: var(--tb-radius);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--tb-text);
+}
+
+.confirm-modal .modal-header {
+  border-bottom-color: var(--tb-border);
+}
+
+.confirm-modal .modal-footer {
+  border-top-color: var(--tb-border);
+}
+
+.confirm-modal .btn-close {
+  filter: invert(1) grayscale(1);
+  opacity: 0.7;
+}
+
+.confirm-modal__icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  font-size: 1.4rem;
+  color: var(--tb-pink);
+  background: color-mix(in srgb, var(--tb-pink) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tb-pink) 35%, transparent);
+}
