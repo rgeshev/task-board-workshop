@@ -1,4 +1,59 @@
 <section class="dashboard-page">
-  <h1 class="h3 mb-3">Dashboard</h1>
-  <p class="text-muted">Dashboard page placeholder.</p>
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+    <div>
+      <span class="tb-eyebrow mb-2"><i class="bi bi-grid-1x2"></i> Dashboard</span>
+      <h1 class="dashboard-page__title mt-2 mb-1">Your projects</h1>
+      <p class="text-soft mb-0">Pick a board and keep things moving.</p>
+    </div>
+    <button class="btn btn-gradient align-self-start">
+      <i class="bi bi-plus-lg me-1"></i> New project
+    </button>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6 col-xl-4">
+      <a href="/projects/1/tasks" data-router-link class="card tb-hover h-100 p-4 text-decoration-none dashboard-card">
+        <div class="d-flex justify-content-between align-items-start">
+          <span class="dashboard-card__icon" style="--icon: var(--tb-violet)"><i class="bi bi-rocket-takeoff"></i></span>
+          <span class="badge dashboard-card__badge">12 tasks</span>
+        </div>
+        <h3 class="h5 mt-3 mb-1">Website Redesign</h3>
+        <p class="text-soft small mb-3">Marketing site refresh and new brand.</p>
+        <div class="dashboard-card__progress">
+          <div class="dashboard-card__bar" style="--value: 66%"></div>
+        </div>
+        <span class="text-soft small mt-2 d-block">66% complete</span>
+      </a>
+    </div>
+
+    <div class="col-md-6 col-xl-4">
+      <a href="/projects/2/tasks" data-router-link class="card tb-hover h-100 p-4 text-decoration-none dashboard-card">
+        <div class="d-flex justify-content-between align-items-start">
+          <span class="dashboard-card__icon" style="--icon: var(--tb-cyan)"><i class="bi bi-phone"></i></span>
+          <span class="badge dashboard-card__badge">8 tasks</span>
+        </div>
+        <h3 class="h5 mt-3 mb-1">Mobile App</h3>
+        <p class="text-soft small mb-3">iOS and Android MVP release.</p>
+        <div class="dashboard-card__progress">
+          <div class="dashboard-card__bar" style="--value: 40%"></div>
+        </div>
+        <span class="text-soft small mt-2 d-block">40% complete</span>
+      </a>
+    </div>
+
+    <div class="col-md-6 col-xl-4">
+      <a href="/projects/3/tasks" data-router-link class="card tb-hover h-100 p-4 text-decoration-none dashboard-card">
+        <div class="d-flex justify-content-between align-items-start">
+          <span class="dashboard-card__icon" style="--icon: var(--tb-green)"><i class="bi bi-megaphone"></i></span>
+          <span class="badge dashboard-card__badge">10 tasks</span>
+        </div>
+        <h3 class="h5 mt-3 mb-1">Q3 Campaign</h3>
+        <p class="text-soft small mb-3">Launch plan and content calendar.</p>
+        <div class="dashboard-card__progress">
+          <div class="dashboard-card__bar" style="--value: 85%"></div>
+        </div>
+        <span class="text-soft small mt-2 d-block">85% complete</span>
+      </a>
+    </div>
+  </div>
 </section>

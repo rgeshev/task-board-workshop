@@ -1,6 +1,11 @@
-<header class="app-header border-bottom bg-white">
-  <nav class="navbar navbar-expand-lg navbar-light container">
-    <a class="navbar-brand fw-semibold" href="/" data-router-link>Task Board</a>
+<header class="app-header">
+  <nav class="navbar navbar-expand-lg container">
+    <a class="navbar-brand d-flex align-items-center gap-2 fw-semibold" href="/" data-router-link>
+      <span class="app-header__logo">
+        <i class="bi bi-kanban-fill"></i>
+      </span>
+      <span>Task<span class="text-gradient">Board</span></span>
+    </a>
     <button
       class="navbar-toggler"
       type="button"
@@ -13,18 +18,26 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="mainNavbar">
-      <ul class="navbar-nav ms-auto">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
         <li class="nav-item">
-          <a class="nav-link" href="/" data-router-link data-nav-link="/">Home</a>
+          <a class="nav-link" href="/" data-router-link data-nav-link="/">
+            <i class="bi bi-house-door me-1"></i>Home
+          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/login" data-router-link data-nav-link="/login">Login</a>
+          <a class="nav-link" href="/dashboard" data-router-link data-nav-link="/dashboard">
+            <i class="bi bi-grid-1x2 me-1"></i>Dashboard
+          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/dashboard" data-router-link data-nav-link="/dashboard">Dashboard</a>
+          <a class="nav-link" href="/projects/1/tasks" data-router-link data-nav-link="/projects">
+            <i class="bi bi-list-check me-1"></i>Projects
+          </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/projects/1/tasks" data-router-link data-nav-link="/projects">Projects</a>
+        <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+          <a class="btn btn-gradient" href="/login" data-router-link data-nav-link="/login">
+            <i class="bi bi-box-arrow-in-right me-1"></i>Login
+          </a>
         </li>
       </ul>
     </div>

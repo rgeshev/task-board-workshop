@@ -1,3 +1,63 @@
 .login-page {
-  padding: 2rem 0;
+  padding-block: clamp(2rem, 6vw, 5rem);
+}
+
+.login-page__headline {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.login-page__perks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.login-page__perks li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--tb-text);
+}
+
+.login-page__perks i {
+  color: var(--tb-green);
+  font-size: 1.1rem;
+}
+
+.login-page__logo {
+  display: inline-grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  font-size: 1.6rem;
+  color: #0a0f1f;
+  background: var(--tb-grad-brand);
+  box-shadow: var(--tb-shadow-glow);
+}
+
+.login-page .input-group-text {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--tb-border);
+  color: var(--tb-muted);
+  border-radius: 12px 0 0 12px;
+}
+
+.login-page .form-control {
+  border-left: 0;
+}
+
+.login-page__link {
+  color: var(--tb-cyan);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-page__link:hover {
+  text-decoration: underline;
 }

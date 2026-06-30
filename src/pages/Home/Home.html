@@ -1,3 +1,86 @@
-<section class="home-page text-center">
-  <h1 class="display-4">Hello world!</h1>
+<section class="home-hero">
+  <div class="home-hero__bg" data-live-bg></div>
+  <div class="home-hero__inner container">
+    <span class="tb-eyebrow mb-4">
+      <i class="bi bi-kanban"></i>
+      Your projects, beautifully organized
+    </span>
+
+    <h1 class="home-hero__title">
+      Turn your to-do chaos into
+      <span class="text-gradient">finished projects</span>
+    </h1>
+
+    <p class="home-hero__subtitle">
+      Plan stages, track tasks and watch progress come alive on a kanban board
+      built for focus. Everything in one calm, fast workspace.
+    </p>
+
+    <div class="home-hero__cta">
+      <a href="/login" data-router-link class="btn btn-gradient btn-lg home-hero__cta-btn">
+        <i class="bi bi-box-arrow-in-right me-2"></i>
+        Login to manage your projects
+      </a>
+      <a href="/dashboard" data-router-link class="btn btn-glass btn-lg">
+        <i class="bi bi-grid-1x2 me-2"></i>
+        Explore the board
+      </a>
+    </div>
+
+    <ul class="home-hero__stats">
+      <li>
+        <span class="home-hero__stat-num text-gradient">3</span>
+        <span class="home-hero__stat-label">Workflow stages</span>
+      </li>
+      <li>
+        <span class="home-hero__stat-num text-gradient">∞</span>
+        <span class="home-hero__stat-label">Tasks to crush</span>
+      </li>
+      <li>
+        <span class="home-hero__stat-num text-gradient">100%</span>
+        <span class="home-hero__stat-label">In your control</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="home-features container">
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-4">
+      <div class="card tb-hover h-100 p-4">
+        <div class="home-features__icon" style="--icon: var(--tb-violet)">
+          <i class="bi bi-list-check"></i>
+        </div>
+        <h3 class="h5 mt-3">Organize with stages</h3>
+        <p class="text-soft mb-0">
+          Drop tasks into Not Started, In Progress and Done. Keep every project
+          moving in a clean, visual flow.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="card tb-hover h-100 p-4">
+        <div class="home-features__icon" style="--icon: var(--tb-cyan)">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <h3 class="h5 mt-3">Track real progress</h3>
+        <p class="text-soft mb-0">
+          See completion at a glance with live charts and progress rings, so you
+          always know what's next.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="card tb-hover h-100 p-4">
+        <div class="home-features__icon" style="--icon: var(--tb-green)">
+          <i class="bi bi-shield-lock"></i>
+        </div>
+        <h3 class="h5 mt-3">Private by default</h3>
+        <p class="text-soft mb-0">
+          Your boards are yours alone. Secure sign-in keeps every project and
+          task visible only to you.
+        </p>
+      </div>
+    </div>
+  </div>
 </section>

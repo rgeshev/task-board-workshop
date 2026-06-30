@@ -1,3 +1,74 @@
 .project-tasks-page {
-  padding: 1rem 0;
+  padding-block: 0.5rem 2rem;
+}
+
+.project-tasks-page__title {
+  font-size: clamp(1.7rem, 4vw, 2.4rem);
+  font-weight: 800;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+}
+
+.board__col {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--tb-border);
+  border-radius: var(--tb-radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.board__col-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding-bottom: 0.5rem;
+}
+
+.board__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dot, var(--tb-muted));
+  box-shadow: 0 0 12px var(--dot, var(--tb-muted));
+}
+
+.board__count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--tb-muted);
+  background: var(--tb-surface-strong);
+  border: 1px solid var(--tb-border);
+  border-radius: 999px;
+  padding: 0.05rem 0.6rem;
+}
+
+.board__task {
+  cursor: grab;
+}
+
+.board__task .form-check-label {
+  font-weight: 600;
+  color: var(--tb-text);
+}
+
+.board__task--done .form-check-label {
+  text-decoration: line-through;
+  color: var(--tb-muted);
+}
+
+.board__task .form-check-input:checked {
+  background-color: var(--tb-green);
+  border-color: var(--tb-green);
 }
